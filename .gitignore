@@ -1,0 +1,72 @@
+# ==========================================
+# 🛑 GitHub File Size Limits & Build Artifacts (CRITICAL)
+# ==========================================
+# PyInstaller output folders (contain 600MB+ executables)
+build/
+dist/
+*.exe
+*.pkg
+*.pyz
+*.toc
+warn-*.txt
+xref-*.html
+
+# ==========================================
+# 🐍 Python Artifacts & Virtual Environments
+# ==========================================
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv/
+ENV/
+env.bak/
+venv.bak/
+
+# ==========================================
+# 🔐 Secrets, Credentials & Sensitive Data
+# ==========================================
+# Environment variables containing database passwords & secrets
+.env
+.env.local
+.env.*.local
+*.env
+config/.env
+config/secrets.py
+config/local_*.py
+
+# Keep example files tracked
+!.env.example
+!config/db_config.example.py
+!feedback.csv.example
+
+# Runtime feedback data (contains user submitted feedback)
+feedback.csv
+
+# ==========================================
+# 💻 IDE & Editor Artifacts
+# ==========================================
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# ==========================================
+# 🖥️ OS Specific Files
+# ==========================================
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# ==========================================
+# 📋 Logs & Temporary Files
+# ==========================================
+*.log
+scratch/
+tmp/

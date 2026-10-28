@@ -1,0 +1,4 @@
+Timestamp,Sentence,VADER,TextBlob,Sentiment
+2026-01-01T12:00:00.000000,Great service and quick support!,0.6588,0.8,Positive
+2026-01-01T12:05:00.000000,The product is okay,0.0,0.5,Neutral
+2026-01-01T12:10:00.000000,Poor experience with delivery,-0.4767,-0.4,Negative

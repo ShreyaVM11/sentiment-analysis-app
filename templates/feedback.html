@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Customer Feedback 💬</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body class="feedback-page">
+  <div class="page-wrapper">
+    
+    <header class="site-header">
+      <h1>Customer Feedback</h1>
+    </header>
+
+  <h2>View the Image and Share Your Feedback</h2>
+<div style="display: flex; justify-content: center; align-items: center; margin-top: 20px;">
+  <img src="{{ url_for('static', filename='images/FastFood.jpg') }}" 
+       alt="Feedback Image" 
+       style="max-width:40%; height:auto; border-radius:10px; 
+              box-shadow:0 0 10px gray; margin:20px auto; display:block;">
+</div>
+
+
+    <main class="content">
+      <div class="container">
+        <label for="feedbackText" class="sr-only">Your feedback</label>
+        <form method="POST" action="/submit" id="feedbackForm" class="feedback-form">
+          
+          <textarea id="feedbackText" name="feedback" placeholder="Type or speak your feedback..." rows="5" required></textarea>
+          <div class="row"><br>
+            <button type="submit" class="btn primary">Submit</button><br><br>
+
+            <p>Want to give feedback by voice🎤</p><br>
+            <button type="button" id="voiceBtn" title="Speak your feedback" class="btn circle">voice🎤</button>
+            <br><br>
+            <div class="quick-buttons">
+              <button type="button" id="thumbUp" class="btn circle like">👍</button>
+              <button type="button" id="thumbDown" class="btn circle dislike">👎</button>
+            </div>
+
+<div class="emoji-feedback mt-3">
+  <button class="btn btn-light" onclick="sendQuickFeedback('angry')">😡</button>
+  <button class="btn btn-light" onclick="sendQuickFeedback('sad')">☹</button>
+  <button class="btn btn-light" onclick="sendQuickFeedback('neutral')">😐</button>
+  <button class="btn btn-light" onclick="sendQuickFeedback('happy')">😊</button>
+  <button class="btn btn-light" onclick="sendQuickFeedback('excited')">😃</button>
+</div>
+
+<div id="feedback-toast" class="feedback-toast" role="status" aria-live="polite" hidden>Thank you!</div>
+
+          </div>
+        </form>
+
+        {% if message %}
+          <p class="msg">{{ message }}</p>
+        {% elif error %}
+          <p class="err">{{ error }}</p>
+        {% endif %}
+        <br>
+        <a href="/login" class="admin-link">Go to Admin Dashboard</a>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    // Text-to-speech
+    function speak(text) {
+      if (!("speechSynthesis" in window)) return;
+      const u = new SpeechSynthesisUtterance(text);
+      u.rate = 1; u.pitch = 1; u.lang = "en-US";
+      window.speechSynthesis.speak(u);
+    }
+
+    // Voice recognition (webkitSpeechRecognition)
+    const voiceBtn = document.getElementById("voiceBtn");
+    const feedbackText = document.getElementById("feedbackText");
+    if ("webkitSpeechRecognition" in window) {
+      const recognition = new webkitSpeechRecognition();
+      recognition.lang = "en-US";
+      recognition.continuous = false;
+      recognition.interimResults = false;
+
+      voiceBtn.addEventListener("click", () => {
+        try {
+          recognition.start();
+          voiceBtn.classList.add("listening");
+        } catch(e) { /* ignore */ }
+      });
+
+      recognition.onresult = (evt) => {
+        const transcript = evt.results[0][0].transcript;
+        feedbackText.value = transcript;
+        voiceBtn.classList.remove("listening");
+      };
+
+      recognition.onerror = () => {
+        alert("Voice recognition error");
+        voiceBtn.classList.remove("listening");
+      };
+
+      recognition.onend = () => voiceBtn.classList.remove("listening");
+    } else {
+      // hide voice button if not supported (optional)
+      // voiceBtn.style.display = "none";
+    }
+
+    // Quick feedback (ajax)
+    async function sendQuickFeedback(type) {
+      try {
+        const res = await fetch("/quick_feedback", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ quick: type })
+        });
+        const data = await res.json();
+        speak("Thank you for your Feedback!");
+        alert("Recorded: " + (data.sentiment || type));
+      } catch(err) {
+        alert("Could not send feedback.");
+      }
+    }
+
+    document.getElementById("thumbUp").addEventListener("click", () => sendQuickFeedback("like"));
+    document.getElementById("thumbDown").addEventListener("click", () => sendQuickFeedback("dislike"));
+
+    // Speak after submit
+    document.getElementById("feedbackForm").addEventListener("submit", () => {
+      speak("Thank you for your feedback!");
+    });
+
+document.addEventListener('DOMContentLoaded', () => {
+  const emojiButtons = document.querySelectorAll('.emoji-btn');
+  const toast = document.getElementById('feedback-toast');
+
+  function showToast(message = 'Thank you!') {
+    toast.textContent = message;
+    toast.hidden = false;
+    setTimeout(() => (toast.hidden = true), 2000);
+  }
+
+  emojiButtons.forEach(button => {
+    button.addEventListener('click', async () => {
+      const quick = button.dataset.quick;
+
+      try {
+        const response = await fetch('/quick_feedback', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({ quick })
+        });
+
+        if (response.ok) {
+          showToast('Thank you!');
+        } else {
+          showToast('Error, try again.');
+        }
+      } catch (error) {
+        console.error(error);
+        showToast('Network error.');
+      }
+    });
+  });
+});
+
+  </script>
+</body>
+</html>

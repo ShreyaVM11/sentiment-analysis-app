@@ -1,0 +1,32 @@
+import requests
+import time
+import random
+
+# The URL of your Web Dev backend (Local or Deployed)
+API_ENDPOINT = "http://localhost:3000/api/sensor-data"
+
+def read_sensor():
+    # Simulate a sensor reading (e.g., Waste level or Temperature)
+    # In a real project, you'd use 'import RPi.GPIO' or 'serial' here
+    return round(random.uniform(20.0, 25.0), 2)
+
+def send_data():
+    while True:
+        sensor_value = read_sensor()
+        payload = {
+            "device_id": "IOT_NODE_01",
+            "value": sensor_value,
+            "timestamp": time.time()
+        }
+        
+        try:
+            response = requests.post(API_ENDPOINT, json=payload)
+            print(f"Sent: {sensor_value} | Status: {response.status_code}")
+        except Exception as e:
+            print(f"Connection Error: {e}")
+            
+        # Send data every 5 seconds
+        time.sleep(5)
+
+if __name__ == "__main__":
+    send_data()
